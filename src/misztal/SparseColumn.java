@@ -13,7 +13,7 @@ public class SparseColumn extends Column {
         hiden = hide;
         sparsedColumn = new ArrayList<>();
         int i = 0;
-        for (Value value : column.getActual_column()) {
+        for (Value value : column.getActualColumn()) {
             if (!(value.equals(hiden))) {
                 COOValue columnValue = new COOValue(i, value);
                 sparsedColumn.add(columnValue);
@@ -35,10 +35,10 @@ public class SparseColumn extends Column {
         Integer i = 0;
         for (i = 0; i < size; ++i) {
             if (j < sparsedColumn.size() && i.equals(sparsedColumn.get(j).getIndex())) {
-                column.actual_column.add(sparsedColumn.get(j).getValue());
+                column.actualColumn.add(sparsedColumn.get(j).getValue());
                 ++j;
             } else {
-                column.actual_column.add(hiden);
+                column.actualColumn.add(hiden);
             }
         }
         return column;

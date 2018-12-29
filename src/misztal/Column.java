@@ -5,27 +5,36 @@ import java.util.ArrayList;
 public class Column {
     protected String name;
     protected Class<? extends Value> type;
-    protected ArrayList<Value> actual_column;
+    protected ArrayList<Value> actualColumn;
 
     @Override
     public String toString() {
-        return "dataframe.misztal.Column \"" + name + "\"" + actual_column;
+        return "dataframe.misztal.Column \"" + name + "\"" + actualColumn;
     }
 
     public Column(String n, Class<? extends Value> t) {
         name = n;
         type = t;
-        actual_column = new ArrayList<>();
+        actualColumn = new ArrayList<>();
+    }
+
+    public ArrayList<Value> distinct(){
+        ArrayList<Value> toReturn=new ArrayList<>();
+        for (Value value : actualColumn){
+            if (!toReturn.contains(value)){
+                toReturn.add(value);
+            }
+        }
+        return toReturn;
     }
 
     /**
      * Dodaje zadany element do kolumny. Sprawdza czy element jest danego typu, jeżeli nie jest wyrzuca wyjątek
-     *
      * @param value
      */
     public void add(Value value) {
         if (type.isInstance(value)) {
-            actual_column.add(value);
+            actualColumn.add(value);
         } else {
             throw new IllegalArgumentException();
         }
@@ -35,7 +44,7 @@ public class Column {
      * @return rozmiar kolumny
      */
     public int size() {
-        return actual_column.size();
+        return actualColumn.size();
     }
 
     /**
@@ -55,8 +64,8 @@ public class Column {
     /**
      * @return zawartość kolumny
      */
-    public ArrayList<Value> getActual_column() {
-        return actual_column;
+    public ArrayList<Value> getActualColumn() {
+        return actualColumn;
     }
 
     /**
@@ -64,12 +73,12 @@ public class Column {
      * @return element o indeksie i
      */
     public Value getElement(int i) {
-        return actual_column.get(i);
+        return actualColumn.get(i);
     }
 
     public Value getMax() {
-        Value toReturn = actual_column.get(0);
-        for (Value value : actual_column) {
+        Value toReturn = actualColumn.get(0);
+        for (Value value : actualColumn) {
             if (value.gte(toReturn)) {
                 toReturn = value;
             }
@@ -78,8 +87,8 @@ public class Column {
     }
 
     public Value getMin() {
-        Value toReturn = actual_column.get(0);
-        for (Value value : actual_column) {
+        Value toReturn = actualColumn.get(0);
+        for (Value value : actualColumn) {
             if (value.lte(toReturn)) {
                 toReturn = value;
             }
@@ -88,16 +97,16 @@ public class Column {
     }
 
     public Value getMean() {
-        return getSum().div(new IntegerValue(actual_column.size()));
+        return getSum().div(new IntegerValue(actualColumn.size()));
     }
 
     public Value getVar() {
         Value mean = getMean();
-        Value toReturn = actual_column.get(0).sub(mean).pow(new IntegerValue(2));
-        for (int i = 1; i < actual_column.size(); ++i) {
-            toReturn = toReturn.add(actual_column.get(i).sub(mean).pow(new IntegerValue(2)));
+        Value toReturn = actualColumn.get(0).sub(mean).pow(new IntegerValue(2));
+        for (int i = 1; i < actualColumn.size(); ++i) {
+            toReturn = toReturn.add(actualColumn.get(i).sub(mean).pow(new IntegerValue(2)));
         }
-        toReturn = toReturn.div(new IntegerValue(actual_column.size()));
+        toReturn = toReturn.div(new IntegerValue(actualColumn.size()));
         return toReturn;
     }
 
@@ -107,37 +116,37 @@ public class Column {
     }
 
     public Value getSum() {
-        Value toReturn = actual_column.get(0);
-        for (int i = 1; i < actual_column.size(); ++i) {
-            toReturn = toReturn.add(actual_column.get(i));
+        Value toReturn = actualColumn.get(0);
+        for (int i = 1; i < actualColumn.size(); ++i) {
+            toReturn = toReturn.add(actualColumn.get(i));
         }
         return toReturn;
     }
 
     public Column addValueToColumn(Value value) {
-        for (int i = 0; i < actual_column.size(); ++i) {
-            actual_column.set(i, actual_column.get(i).add(value));
+        for (int i = 0; i < actualColumn.size(); ++i) {
+            actualColumn.set(i, actualColumn.get(i).add(value));
         }
         return this;
     }
 
     public Column multiplyColumnByValue(Value value) {
-        for (int i = 0; i < actual_column.size(); ++i) {
-            actual_column.set(i, actual_column.get(i).mul(value));
+        for (int i = 0; i < actualColumn.size(); ++i) {
+            actualColumn.set(i, actualColumn.get(i).mul(value));
         }
         return this;
     }
 
     public Column subtractValueFromColumn(Value value) {
-        for (int i = 0; i < actual_column.size(); ++i) {
-            actual_column.set(i, actual_column.get(i).sub(value));
+        for (int i = 0; i < actualColumn.size(); ++i) {
+            actualColumn.set(i, actualColumn.get(i).sub(value));
         }
         return this;
     }
 
     public Column divideColumnByValue(Value value) {
-        for (int i = 0; i < actual_column.size(); ++i) {
-            actual_column.set(i, actual_column.get(i).div(value));
+        for (int i = 0; i < actualColumn.size(); ++i) {
+            actualColumn.set(i, actualColumn.get(i).div(value));
         }
         return this;
     }

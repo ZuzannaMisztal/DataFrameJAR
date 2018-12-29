@@ -6,7 +6,6 @@ package misztal;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,11 +19,19 @@ public class DataFrame {
 
     public class GroupedDataFrame implements GroupBy {
         protected HashMap<ArrayList<Value>, DataFrame> dataFrameHashMap;
-        protected String[] columnNamesToGroupBy;
+        protected ArrayList<String> columnNamesToGroupBy;
 
-        public GroupedDataFrame(HashMap<ArrayList<Value>, DataFrame> dataFrameHashMap, String[] columnNamesToGroupBy) {
+        public GroupedDataFrame(HashMap<ArrayList<Value>, DataFrame> dataFrameHashMap, ArrayList<String> columnNamesToGroupBy) {
             this.dataFrameHashMap = dataFrameHashMap;
             this.columnNamesToGroupBy = columnNamesToGroupBy;
+        }
+
+        public HashMap<ArrayList<Value>, misztal.DataFrame> getDataFrameHashMap() {
+            return dataFrameHashMap;
+        }
+
+        public ArrayList<String> getColumnNamesToGroupBy() {
+            return columnNamesToGroupBy;
         }
 
         public DataFrame apply(Applayable applayable) {
@@ -32,10 +39,10 @@ public class DataFrame {
             DataFrame applied = new DataFrame(new ArrayList<>(), new ArrayList<>());
             ArrayList<Class<? extends Value>> tNamesToGroupedBy = new ArrayList<>();
 
-            for (String name : new ArrayList<>(Arrays.asList(columnNamesToGroupBy))) {
+            for (String name : columnNamesToGroupBy) {
                 tNamesToGroupedBy.add(get(name).getType());
             }
-            DataFrame groupedBy = new DataFrame(new ArrayList<String>(Arrays.asList(columnNamesToGroupBy)), tNamesToGroupedBy);
+            DataFrame groupedBy = new DataFrame(columnNamesToGroupBy, tNamesToGroupedBy);
 
             for (Map.Entry<ArrayList<Value>, DataFrame> dataFrameEntry : dataFrameHashMap.entrySet()) {
                 if (first) {
@@ -66,7 +73,7 @@ public class DataFrame {
             ArrayList<Class<? extends Value>> typeNamesToReturn = new ArrayList<>();
             for (String name : columnNames) {
                 Class<? extends Value> clazz = type_names.get(columnNames.indexOf(name));
-                if (Arrays.asList(columnNamesToGroupBy).contains(name)) {
+                if (columnNamesToGroupBy.contains(name)) {
                     columnNamesToReturn.add(name);
                     typeNamesToReturn.add(clazz);
                 } else {
@@ -92,7 +99,7 @@ public class DataFrame {
                 ArrayList<Value> row = new ArrayList<>();
                 int i = 0;
                 for (String name : columnNamesToReturn) {
-                    if (Arrays.asList(columnNamesToGroupBy).contains(name)) {
+                    if (columnNamesToGroupBy.contains(name)) {
                         row.add(dataFrameEntry.getKey().get(i));
                         ++i;
                     } else {
@@ -173,7 +180,7 @@ public class DataFrame {
         public String toString() {
             String toReturn = "";
             for (Map.Entry i : dataFrameHashMap.entrySet()) {
-                toReturn = toReturn + "Grouped by: " + Arrays.toString(columnNamesToGroupBy) + " in " + DataFrame.this.columnNames + "\ndataframe.misztal.Value: " + i.getKey() + " dataframe.misztal.DataFrame: " + i.getValue() + "\n\n";
+                toReturn = toReturn + "Grouped by: " + columnNamesToGroupBy + " in " + DataFrame.this.columnNames + "\ndataframe.misztal.Value: " + i.getKey() + " dataframe.misztal.DataFrame: " + i.getValue() + "\n\n";
             }
             return toReturn;
         }
@@ -186,13 +193,13 @@ public class DataFrame {
      * @param columnNames nazwy kolumn będących kluczem podziału
      * @return Obiekt klasy GroupedDataFrame przechowujący w hashmapie każdą z podzielonych dataframe.misztal.DataFrame
      */
-    public GroupedDataFrame groupBy(String[] columnNames) {
+    public GroupedDataFrame groupBy(ArrayList<String> columnNames) {
         HashMap<ArrayList<Value>, DataFrame> grouped = new HashMap<>();
-        DataFrame columns = get(new ArrayList<String>(Arrays.asList(columnNames)), false);
+        DataFrame columns = get(new ArrayList<String>(columnNames), false);
         ArrayList<String> columnNamesForGrouped = new ArrayList<>();
         ArrayList<Class<? extends Value>> typeNamesForGrouped = new ArrayList<>();
         for (int j = 0; j < this.columnNames.size(); ++j) {
-            if (!Arrays.asList(columnNames).contains(this.columnNames.get(j))) {
+            if (!columnNames.contains(this.columnNames.get(j))) {
                 columnNamesForGrouped.add(this.columnNames.get(j));
                 typeNamesForGrouped.add(type_names.get(j));
             }
@@ -455,16 +462,16 @@ public class DataFrame {
     public ArrayList<Value> getRow(int i) {
         ArrayList<Value> row = new ArrayList<>();
         for (Column column : dataFrame) {
-            row.add(column.getActual_column().get(i));
+            row.add(column.getActualColumn().get(i));
         }
         return row;
     }
 
-    public ArrayList<Value> getRowWithoutSpecifiedColumns(int rowIndex, String[] columnNames) {
+    public ArrayList<Value> getRowWithoutSpecifiedColumns(int rowIndex, ArrayList<String> columnNames) {
         ArrayList<Value> row = new ArrayList<>();
         for (Column column : dataFrame) {
-            if (!Arrays.asList(columnNames).contains(column.getName())) {
-                row.add(column.getActual_column().get(rowIndex));
+            if (!columnNames.contains(column.getName())) {
+                row.add(column.getActualColumn().get(rowIndex));
             }
         }
         return row;

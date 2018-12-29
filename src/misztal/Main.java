@@ -14,13 +14,14 @@ public class Main {
         types.add(DoubleValue.class);
         types.add(DoubleValue.class);
 //        String[] colnames= new String[] {"x","y", "z"};
-        DataFrame ramka = new DataFrame("C:\\Users\\zuzan\\Downloads\\groupby.csv", types, true);
+//        DataFrame ramka = new DataFrame("C:\\Users\\zuzan\\Downloads\\groupby.csv", types, true);
+        DataFrame ramka = new DataFrame("C:\\Users\\zuzan\\Documents\\groupby1.csv", types, true);
 
 
-        String[] names = {"id"};
+        ArrayList<String> names=new ArrayList<>();
+        names.add("id");
 
-        System.out.println(ramka.iloc(0, 4));
-        System.out.println(ramka.iloc(0, 4).get("total").multiplyColumnByValue(new IntegerValue(2)));
+        System.out.println(ramka.groupBy(names).max());
 
     }
 
